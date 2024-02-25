@@ -116,4 +116,10 @@ jobs:
         with:
           teams_webhook_url: ${{ secrets.TEAMS_WEBHOOK_URI }}
           message: "<h1>Checkmarx TeamCity Plugin ${{ env.RELEASE_VERSION }}</h1>${{ steps.clean.outputs.clean }}"
+          status: "success"
+          title: "Checkmarx TeamCity Plugin Release"
+          themeColor: "0078D7"
+          summary: "Checkmarx TeamCity Plugin Release"
+          actionTitle: "View Release"
+          actionUrl: "
         if: ${{ inputs.rchannels == '' || inputs.rchannels == null }}

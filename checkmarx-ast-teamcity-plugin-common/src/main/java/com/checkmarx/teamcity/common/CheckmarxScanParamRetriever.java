@@ -4,8 +4,9 @@ import jetbrains.buildServer.TeamCityRuntimeException;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 import static java.lang.String.format;
@@ -14,23 +15,28 @@ public class CheckmarxScanParamRetriever {
 
     private static final Logger LOG = Logger.getLogger(CheckmarxScanParamRetriever.class);
     private static final int MAX_SCAN_ID_LENGTH = 36;
-    
+
     public static String scanIDRetriever(String filePath, String scanIDSearchParam){
         String scanID = null;
         BufferedReader bufferedReader = null;
         try {
-            bufferedReader = new BufferedReader(new FileReader(filePath, StandardCharsets.UTF_8));
+            // Modified to be compatible with Java 8
+            bufferedReader = new BufferedReader(
+                    new InputStreamReader(
+                            new FileInputStream(filePath), StandardCharsets.UTF_8));
             String logLine = bufferedReader.readLine();
             while(logLine != null) {
                 LOG.warn("Log Line: " + logLine);
                 int searchIndex = logLine.indexOf(scanIDSearchParam);
                 if (searchIndex != -1) {
-                    String uuidSubstring = logLine.substring(searchIndex, (searchIndex + 50));
+                    // Ensure not to exceed the line length
+                    int endOfSubstring = Math.min(searchIndex + 50, logLine.length());
+                    String uuidSubstring = logLine.substring(searchIndex, endOfSubstring);
                     LOG.warn("UUID STRING: " + uuidSubstring);
                     int colonIndex = uuidSubstring.indexOf(':');
                     scanID = (uuidSubstring.substring(colonIndex + 1)).trim();
-                    //trim the scanID to 36 characters to avoid trailing characters
-                    scanID = scanID.length() > MAX_SCAN_ID_LENGTH ? scanID.substring(0,MAX_SCAN_ID_LENGTH) : scanID;
+                    // Trim the scanID to 36 characters to avoid trailing characters
+                    scanID = scanID.length() > MAX_SCAN_ID_LENGTH ? scanID.substring(0, MAX_SCAN_ID_LENGTH) : scanID;
                     LOG.warn("Scan ID retrieved: " + scanID);
                     break;
                 }
@@ -39,7 +45,7 @@ public class CheckmarxScanParamRetriever {
         } catch (IOException e) {
             throw new TeamCityRuntimeException(format("Cannot find the file '%s'", filePath));
         } finally {
-            if(bufferedReader != null){
+            if (bufferedReader != null) {
                 try {
                     bufferedReader.close();
                 } catch (IOException e) {

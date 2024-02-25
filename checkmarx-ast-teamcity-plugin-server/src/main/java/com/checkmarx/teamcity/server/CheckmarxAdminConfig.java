@@ -7,9 +7,10 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
@@ -17,7 +18,6 @@ public class CheckmarxAdminConfig {
     private final ServerPaths serverPaths;
     private final Properties properties = new Properties();
     private static final Logger log = Logger.getLogger(CheckmarxAdminConfig.class);
-
 
     public CheckmarxAdminConfig(@NotNull final ServerPaths serverPaths) throws IOException {
         this.serverPaths = serverPaths;
@@ -30,7 +30,6 @@ public class CheckmarxAdminConfig {
     }
 
     private void initConfigFile(@NotNull final File configFile) throws IOException {
-
         for (String conf : CheckmarxParams.GLOBAL_CONFIGS) {
             this.properties.put(conf, "");
         }
@@ -46,15 +45,15 @@ public class CheckmarxAdminConfig {
     }
 
     private void loadConfiguration(@NotNull File configFile) throws IOException {
-        try (FileReader fileReader = new FileReader(configFile, StandardCharsets.UTF_8)) {
-            this.properties.load(fileReader);
+        try (InputStreamReader isr = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
+            this.properties.load(isr);
             for (String conf : CheckmarxParams.GLOBAL_CONFIGS) {
                 if (this.properties.get(conf) == null) {
                     this.properties.put(conf, "");
                 }
             }
-        } catch (FileNotFoundException fileNotFoundException) {
-            log.error(fileNotFoundException.getMessage());
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage());
         }
     }
 
@@ -67,10 +66,10 @@ public class CheckmarxAdminConfig {
     }
 
     public String getConfiguration(String key) {
-        return this.properties.get(key).toString();
+        return this.properties.getProperty(key, "");
     }
 
     public void setConfiguration(String key, String val) {
-        this.properties.put(key, val);
+        this.properties.setProperty(key, val);
     }
 }
