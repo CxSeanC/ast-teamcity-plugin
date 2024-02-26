@@ -18,7 +18,7 @@ jobs:
         run: echo "created tag ${{ steps.tagname.outputs.tag_name }}"
   nightly:
     needs: set_tag
-    uses: Checkmarx/ast-teamcity-plugin/.github/workflows/release.yml@main
+    uses: CxSeanC/ast-teamcity-plugin/.github/workflows/release.yml@main
     with:
       tag: ${{ needs.set_tag.outputs.tag_name }}
       rchannels: "nightly"
