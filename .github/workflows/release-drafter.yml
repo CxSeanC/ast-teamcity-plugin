@@ -31,8 +31,8 @@ jobs:
         run: mvn -B package --file pom.xml -s $GITHUB_WORKSPACE/settings.xml
 
       - uses: hugo19941994/delete-draft-releases@v1.0.1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release
         id: create_release
