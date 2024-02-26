@@ -22,6 +22,12 @@ on:
         required: false
         type: string
 jobs:
+  deleteDevReleases:
+    uses: CxSeanC/ast-teamcity-plugin/.github/workflows/delete-dev-releases.yml@main
+    with:
+      tag: ${{ inputs.rchannels }}
+    secrets: inherit
+    if: inputs.rchannels
   release:
     runs-on: ubuntu-latest
 
